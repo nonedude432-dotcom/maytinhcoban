@@ -1,475 +1,102 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tra cứu loài mèo | Cat Finder</title>
-  <meta name="description" content="Trang web hiển thị hình ảnh và tìm kiếm thông tin về các loài mèo." />
-  <link rel="preconnect" href="https://placekitten.com">
+  <meta charset="UTF-8">
+  <title>Công cụ tính toán</title>
   <style>
-    :root{
-      --bg: #0f1216;
-      --card: #171b21;
-      --text: #e9eef6;
-      --muted: #aeb6c2;
-      --accent: #6dd6ff;
-      --accent-2: #9ef0a8;
-      --danger: #ff7a7a;
-      --border: #252b34;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-      background: radial-gradient(1200px 600px at 20% -10%, #1a2028 0%, var(--bg) 40%) fixed;
-      color: var(--text);
-      line-height: 1.6;
+    .calculator {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      width: 300px;
     }
-    header{
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      backdrop-filter: saturate(110%) blur(6px);
-      background: linear-gradient(180deg, rgba(15,18,22,0.85) 0%, rgba(15,18,22,0.55) 100%);
-      border-bottom: 1px solid var(--border);
+    .calculator h2 {
+      text-align: center;
+      margin-bottom: 20px;
     }
-    .container{
-      max-width: 1100px;
-      padding: 0 16px;
-      margin: 0 auto;
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
-    .topbar{
-      display:flex;
-      gap:16px;
-      align-items:center;
-      padding: 16px 0;
-    }
-    .logo{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      text-decoration:none;
-      color: var(--text);
-    }
-    .logo .mark{
-      width:36px; height:36px; border-radius:8px;
-      display:grid; place-items:center;
-      background: linear-gradient(135deg, #6dd6ff 0%, #9ef0a8 100%);
-      color:#0e1116; font-weight: 700;
-      box-shadow: 0 6px 18px rgba(109,214,255,0.35);
-    }
-    .title{
-      font-weight:700; font-size: 18px;
-    }
-    .search-wrap{
-      flex:1;
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-    .search{
-      flex:1;
-      display:flex; align-items:center; gap:10px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 12px;
-    }
-    .search input{
-      flex:1; border:none; outline:none;
-      background: transparent; color: var(--text);
-      font-size: 15px;
-    }
-    .pill{
-      border: 1px solid var(--border);
-      background: #13161b;
-      color: var(--muted);
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 13px;
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: none;
+      border-radius: 5px;
+      background: #007BFF;
+      color: #fff;
+      font-size: 16px;
       cursor: pointer;
-      transition: 0.2s ease;
     }
-    .pill.active{
-      color: #0e1116;
-      background: var(--accent);
-      border-color: transparent;
-      box-shadow: 0 6px 16px rgba(109,214,255,0.3);
+    button:hover {
+      background: #0056b3;
     }
-    main{padding: 20px 0 60px}
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap:16px;
-    }
-    @media (max-width: 1000px){
-      .grid{grid-template-columns: repeat(3, 1fr)}
-    }
-    @media (max-width: 700px){
-      .grid{grid-template-columns: repeat(2, 1fr)}
-      .title{display:none}
-    }
-    @media (max-width: 460px){
-      .grid{grid-template-columns: 1fr}
-    }
-    .card{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      display:flex; flex-direction:column;
-      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-    }
-    .card:hover{
-      transform: translateY(-2px);
-      border-color: #2c3440;
-      box-shadow: 0 14px 28px rgba(0,0,0,0.25);
-    }
-    .thumb{
-      aspect-ratio: 4 / 3;
-      width:100%;
-      object-fit: cover;
-      background: #0e1116;
-    }
-    .content{
-      padding: 12px 14px 14px;
-      display:flex; flex-direction:column; gap:8px;
-    }
-    .name{
-      font-weight:700; font-size: 16px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:8px;
-    }
-    .origin{
-      font-size: 13px; color: var(--muted);
-    }
-    .tags{
-      display:flex; gap:8px; flex-wrap:wrap;
-    }
-    .tag{
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border:1px solid var(--border);
-      color: var(--muted);
-      background:#14181e;
-    }
-    .desc{
-      font-size: 13px; color: #cfd6e2;
-      min-height: 44px;
-    }
-    .meta{
-      display:flex; gap:10px; align-items:center; justify-content:space-between;
-      border-top: 1px dashed var(--border);
-      padding-top: 10px; margin-top: 6px;
-    }
-    .btn{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 8px 12px; border-radius: 10px;
-      border:1px solid var(--border);
-      color: var(--text); background:#14181e;
-      cursor:pointer; transition:.2s ease;
-      font-size: 13px;
-    }
-    .btn:hover{border-color:#3a4454}
-    .score{
-      font-size: 12px; color: var(--muted);
-    }
-    footer{
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      padding: 18px 0;
-    }
-    .empty{
-      text-align:center; color: var(--muted);
-      border:1px dashed var(--border); border-radius: 16px;
-      padding: 30px; margin: 12px 0;
-    }
-    .highlight{
-      background: linear-gradient(180deg, rgba(109,214,255,0.2), rgba(158,240,168,0.15));
-      border-radius: 6px;
-      padding: 0 2px;
+    .result {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
-  <header role="banner">
-    <div class="container">
-      <div class="topbar" aria-label="Thanh điều hướng">
-        <a class="logo" href="#" aria-label="Trang chủ Cat Finder">
-          <div class="mark" aria-hidden="true">🐱</div>
-          <div class="title">Cat Finder — Tra cứu loài mèo</div>
-        </a>
-        <div class="search-wrap">
-          <div class="search" role="search">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
-            </svg>
-            <input id="q" type="search" placeholder="Tìm theo tên, nguồn gốc, tính cách..." aria-label="Ô tìm kiếm loài mèo" autocomplete="off" />
-          </div>
-          <button class="pill active" id="filterAll" aria-pressed="true">Tất cả</button>
-          <button class="pill" id="filterShort">Lông ngắn</button>
-          <button class="pill" id="filterLong">Lông dài</button>
-          <button class="pill" id="filterHypo">Ít gây dị ứng</button>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main role="main">
-    <div class="container">
-      <section aria-labelledby="result-heading">
-        <h2 id="result-heading" style="margin:10px 0 18px">Danh sách loài mèo</h2>
-        <div id="grid" class="grid" aria-live="polite"></div>
-        <div id="empty" class="empty" hidden>Không tìm thấy kết quả phù hợp. Thử từ khóa khác hoặc bỏ bộ lọc.</div>
-      </section>
-    </div>
-  </main>
-
-  <footer role="contentinfo">
-    <div class="container">
-      © 2025 Cat Finder • Hình minh họa từ placekitten.com • Dữ liệu mô tả mang tính tham khảo.
-    </div>
-  </footer>
+  <div class="calculator">
+    <h2>Công cụ tính toán</h2>
+    <input type="number" id="num1" placeholder="Nhập số thứ nhất">
+    <input type="number" id="num2" placeholder="Nhập số thứ hai">
+    <select id="operation">
+      <option value="add">Cộng (+)</option>
+      <option value="subtract">Trừ (-)</option>
+      <option value="multiply">Nhân (×)</option>
+      <option value="divide">Chia (÷)</option>
+    </select>
+    <button onclick="calculate()">Tính toán</button>
+    <div class="result" id="result">Kết quả sẽ hiển thị ở đây</div>
+  </div>
 
   <script>
-    // Dữ liệu mẫu về các giống mèo
-    const breeds = [
-      {
-        id: "siamese",
-        name: "Siamese",
-        origin: "Thailand",
-        coat: "short",
-        hypoallergenic: false,
-        temperament: ["Affectionate","Vocal","Curious"],
-        description: "Giống mèo thanh mảnh, mắt xanh đặc trưng, rất tình cảm và thích giao tiếp.",
-        image: "https://placekitten.com/600/420",
-        popularity: 9.1
-      },
-      {
-        id: "persian",
-        name: "Persian",
-        origin: "Iran",
-        coat: "long",
-        hypoallergenic: false,
-        temperament: ["Calm","Gentle","Quiet"],
-        description: "Bộ lông dài dày, tính cách điềm đạm, phù hợp không gian yên tĩnh.",
-        image: "https://placekitten.com/601/420",
-        popularity: 8.4
-      },
-      {
-        id: "maine-coon",
-        name: "Maine Coon",
-        origin: "United States",
-        coat: "long",
-        hypoallergenic: false,
-        temperament: ["Friendly","Playful","Intelligent"],
-        description: "Kích thước lớn, thân thiện, thông minh; còn được gọi là 'gentle giant'.",
-        image: "https://placekitten.com/602/420",
-        popularity: 9.0
-      },
-      {
-        id: "british-shorthair",
-        name: "British Shorthair",
-        origin: "United Kingdom",
-        coat: "short",
-        hypoallergenic: false,
-        temperament: ["Calm","Loyal","Easygoing"],
-        description: "Thân hình chắc nịch, tính cách trầm ổn, rất phù hợp gia đình.",
-        image: "https://placekitten.com/603/420",
-        popularity: 8.6
-      },
-      {
-        id: "russian-blue",
-        name: "Russian Blue",
-        origin: "Russia",
-        coat: "short",
-        hypoallergenic: true,
-        temperament: ["Reserved","Affectionate","Intelligent"],
-        description: "Bộ lông xanh xám, ít gây dị ứng, tính cách điềm tĩnh, gắn bó với chủ.",
-        image: "https://placekitten.com/604/420",
-        popularity: 8.1
-      },
-      {
-        id: "ragdoll",
-        name: "Ragdoll",
-        origin: "United States",
-        coat: "long",
-        hypoallergenic: false,
-        temperament: ["Docile","Affectionate","Relaxed"],
-        description: "Nổi tiếng với sự hiền hòa, thường 'mềm người' khi được bế.",
-        image: "https://placekitten.com/605/420",
-        popularity: 8.9
-      },
-      {
-        id: "sphynx",
-        name: "Sphynx",
-        origin: "Canada",
-        coat: "short",
-        hypoallergenic: false,
-        temperament: ["Outgoing","Playful","Affectionate"],
-        description: "Hầu như không có lông, hoạt bát và rất quấn người.",
-        image: "https://placekitten.com/606/420",
-        popularity: 7.8
-      },
-      {
-        id: "bengal",
-        name: "Bengal",
-        origin: "United States",
-        coat: "short",
-        hypoallergenic: false,
-        temperament: ["Active","Curious","Confident"],
-        description: "Vẻ ngoài hoang dã với họa tiết đốm, năng lượng cao và thích khám phá.",
-        image: "https://placekitten.com/607/420",
-        popularity: 8.2
-      },
-      {
-        id: "norwegian-forest",
-        name: "Norwegian Forest",
-        origin: "Norway",
-        coat: "long",
-        hypoallergenic: false,
-        temperament: ["Adaptable","Friendly","Independent"],
-        description: "Bộ lông dày chống lạnh, mạnh mẽ và độc lập nhưng thân thiện.",
-        image: "https://placekitten.com/608/420",
-        popularity: 7.9
-      },
-      {
-        id: "oriental",
-        name: "Oriental Shorthair",
-        origin: "Thailand",
-        coat: "short",
-        hypoallergenic: false,
-        temperament: ["Talkative","Energetic","Affectionate"],
-        description: "Nhiều biến thể màu lông, hướng ngoại và thích trò chuyện.",
-        image: "https://placekitten.com/609/420",
-        popularity: 7.7
+    function calculate() {
+      const num1 = parseFloat(document.getElementById('num1').value);
+      const num2 = parseFloat(document.getElementById('num2').value);
+      const operation = document.getElementById('operation').value;
+      let result;
+
+      if (isNaN(num1) || isNaN(num2)) {
+        result = "Vui lòng nhập đủ hai số!";
+      } else {
+        switch (operation) {
+          case "add":
+            result = num1 + num2;
+            break;
+          case "subtract":
+            result = num1 - num2;
+            break;
+          case "multiply":
+            result = num1 * num2;
+            break;
+          case "divide":
+            result = num2 !== 0 ? (num1 / num2) : "Không thể chia cho 0!";
+            break;
+        }
       }
-    ];
-
-    // Trạng thái lọc
-    let filter = "all";
-    const q = document.getElementById("q");
-    const grid = document.getElementById("grid");
-    const empty = document.getElementById("empty");
-    const btnAll = document.getElementById("filterAll");
-    const btnShort = document.getElementById("filterShort");
-    const btnLong = document.getElementById("filterLong");
-    const btnHypo = document.getElementById("filterHypo");
-    const filterButtons = [btnAll, btnShort, btnLong, btnHypo];
-
-    // Cập nhật trạng thái nút
-    function setActive(btn){
-      filterButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      filterButtons.forEach(b => b.setAttribute("aria-pressed", b === btn ? "true" : "false"));
+      document.getElementById('result').innerText = "Kết quả: " + result;
     }
-
-    btnAll.addEventListener("click", () => { filter="all"; setActive(btnAll); render() });
-    btnShort.addEventListener("click", () => { filter="short"; setActive(btnShort); render() });
-    btnLong.addEventListener("click", () => { filter="long"; setActive(btnLong); render() });
-    btnHypo.addEventListener("click", () => { filter="hypo"; setActive(btnHypo); render() });
-
-    // Tìm kiếm theo chuỗi
-    q.addEventListener("input", () => render());
-
-    // Hàm làm nổi bật từ khóa trong chuỗi
-    function highlight(text, query){
-      if(!query) return text;
-      const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const regex = new RegExp(`(${escaped})`, "ig");
-      return text.replace(regex, '<span class="highlight">$1</span>');
-    }
-
-    // Lọc dữ liệu
-    function getFiltered(){
-      const query = q.value.trim().toLowerCase();
-      return breeds.filter(b => {
-        // Lọc theo loại lông / tính dị ứng
-        const byFilter =
-          filter === "all" ||
-          (filter === "short" && b.coat === "short") ||
-          (filter === "long" && b.coat === "long") ||
-          (filter === "hypo" && b.hypoallergenic === true);
-
-        if(!byFilter) return false;
-
-        if(!query) return true;
-
-        // Khớp theo tên, xuất xứ, temperament, mô tả
-        const haystack = [
-          b.name, b.origin, b.coat,
-          b.temperament.join(" "),
-          b.description
-        ].join(" ").toLowerCase();
-
-        return haystack.includes(query);
-      });
-    }
-
-    // Tạo thẻ HTML cho từng giống
-    function cardTemplate(b, query){
-      const name = highlight(b.name, query);
-      const origin = highlight(b.origin, query);
-      const desc = highlight(b.description, query);
-      const hypo = b.hypoallergenic ? "Ít gây dị ứng" : "Bình thường";
-      const coatLabel = b.coat === "short" ? "Lông ngắn" : "Lông dài";
-
-      return `
-        <article class="card" aria-label="${b.name}">
-          <img class="thumb" src="${b.image}" alt="Ảnh giống mèo ${b.name}" loading="lazy" />
-          <div class="content">
-            <div class="name">
-              <span>${name}</span>
-              <span class="tag">${coatLabel}</span>
-            </div>
-            <div class="origin">Nguồn gốc: ${origin}</div>
-            <p class="desc">${desc}</p>
-            <div class="tags" aria-label="Đặc tính">
-              ${b.temperament.map(t => `<span class="tag">${highlight(t, query)}</span>`).join("")}
-              <span class="tag">${hypo}</span>
-            </div>
-            <div class="meta">
-              <span class="score">Độ phổ biến: ${b.popularity.toFixed(1)}/10</span>
-              <button class="btn" aria-label="Xem chi tiết về ${b.name}" onclick="alertDetail('${b.id}')">
-                Chi tiết
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </article>
-      `;
-    }
-
-    // Hiển thị chi tiết (demo bằng alert)
-    function alertDetail(id){
-      const b = breeds.find(x => x.id === id);
-      if(!b) return;
-      const coatLabel = b.coat === "short" ? "Lông ngắn" : "Lông dài";
-      const msg =
-`${b.name}
-Nguồn gốc: ${b.origin}
-Bộ lông: ${coatLabel}
-Ít gây dị ứng: ${b.hypoallergenic ? "Có" : "Không"}
-Tính cách: ${b.temperament.join(", ")}
-Mô tả: ${b.description}`;
-      alert(msg);
-    }
-    window.alertDetail = alertDetail;
-
-    // Render lưới
-    function render(){
-      const query = q.value.trim();
-      const data = getFiltered();
-      grid.innerHTML = data.map(b => cardTemplate(b, query)).join("");
-      empty.hidden = data.length > 0;
-    }
-
-    // Khởi tạo
-    render();
   </script>
 </body>
 </html>
+
+
+
